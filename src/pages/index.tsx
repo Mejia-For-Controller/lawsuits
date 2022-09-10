@@ -6,10 +6,15 @@ import Seo from '@/components/Seo';
 
 import lawsuitssource from './csvjson.json';
 
-function titleCase(str) {
+function titleCase(str: string) {
   return str.toLowerCase().split(' ').map(function (word) {
     return (word.charAt(0).toUpperCase() + word.slice(1));
   }).join(' ');
+}
+
+interface eachrow {
+  "DOLLAR AMOUNT": string;
+  "DATE": string;
 }
 
 /**
@@ -30,7 +35,7 @@ export default function HomePage() {
   const [sortCol, setSortCol] = React.useState('amount');
 
 
-  const sortElements = (a, b) => {
+  const sortElements = (a: any, b: any) => {
 
     if (sortCol === 'amount') {
 
@@ -44,8 +49,8 @@ export default function HomePage() {
 
       //sort dates from MM/DD/YYYY format from newest to oldest
 
-      const aDate = new Date(a['DATE']);
-      const bDate = new Date(b['DATE']);
+      const aDate: number = new Date(a['DATE']).getTime();
+      const bDate: number = new Date(b['DATE']).getTime();
 
       return bDate - aDate;
 
@@ -58,7 +63,7 @@ export default function HomePage() {
       <Head>
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
         <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
 
       </Head>
@@ -143,7 +148,7 @@ export default function HomePage() {
 
                       return amount >= 100000
                     })
-                    .sort((a, b) => {
+                    .sort((a: any, b: any) => {
                       return sortElements(a, b)
 
                     })
@@ -217,10 +222,12 @@ export default function HomePage() {
 
                           return amount >= 100000
                         })
-                        .sort((a, b) => {
-                          return sortElements(a, b)
+                        .sort(
 
-                        })
+                          (a: any, b: any) => {
+                            return sortElements(a, b)
+
+                          })
                         .map((item, itemkey) => (
                           <>
                             <tr>
