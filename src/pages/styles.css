@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Lexend Deca', sans-serif;
+}
+
+p {
+  font-family: 'Lexend Deca', sans-serif;
+}
+
+.lexend {
+  font-family: 'Lexend Deca', sans-serif !important;
+}
