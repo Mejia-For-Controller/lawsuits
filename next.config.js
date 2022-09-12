@@ -3,6 +3,9 @@ module.exports = {
   eslint: {
     dirs: ['src'],
   },
+  images: {
+    unoptimized: true,
+  },
 
   reactStrictMode: true,
 
