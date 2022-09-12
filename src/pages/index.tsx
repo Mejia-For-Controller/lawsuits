@@ -1,6 +1,7 @@
 import { MantineProvider, SegmentedControl } from '@mantine/core';
 import Head from 'next/head'
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import Seo from '@/components/Seo';
 
@@ -12,10 +13,76 @@ function titleCase(str: string) {
   }).join(' ');
 }
 
-interface eachrow {
-  "DOLLAR AMOUNT": string;
-  "DATE": string;
+interface linksprops {
+  str: string;
 }
+
+function SupportingLinks(props: linksprops) {
+  const urlexp = new RegExp(/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi);
+
+
+  const [thelinks, setthelinks] = useState<Array<string>>([]);
+
+  useEffect(() => {
+    const potentialmatches = props.str.match(urlexp);
+
+    if (potentialmatches) {
+      if (Array.isArray(potentialmatches)) {
+        setthelinks(potentialmatches);
+      }
+
+    }
+  }, [props.str])
+
+  return (
+    <>
+      {
+        thelinks
+          .map((url: string, urlkey) => (
+            <>
+              <a key={urlkey} href={url} target="_blank"
+                style={{
+                  color: '#41ffca'
+                }}
+                className='underline  hover:text-cyan-400' rel="noreferrer">{url.replace(/http(s)?:\/\//, "")}</a>
+              {
+                urlkey != (thelinks.length - 1) && (
+                  <br />
+                )
+              }
+            </>
+          )
+          )
+      }
+    </>
+  )
+}
+
+interface eachlawsuit {
+
+  "Supporting Links": string,
+  [key: string]: any
+
+}
+
+function arrayNeverNull(array: any[]) {
+  if (array === null) {
+    return [];
+  } else {
+    return array;
+  }
+}
+
+function bruhdontnull(input: any) {
+  if (input === null || input === undefined || typeof input != "string") {
+    return "";
+  } else {
+    return input;
+  }
+}
+
+
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 
 /**
  * SVGR Support
@@ -30,11 +97,10 @@ interface eachrow {
 // to customize the default configuration.s
 
 export default function HomePage() {
-  const urlexp = new RegExp(/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi);
   const [format, setformat] = React.useState('list');
   const [sortCol, setSortCol] = React.useState('amount');
 
-
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   const sortElements = (a: any, b: any) => {
 
     if (sortCol === 'amount') {
@@ -43,18 +109,25 @@ export default function HomePage() {
 
       const bAm = parseFloat(b['DOLLAR AMOUNT'].replace(/\$/g, "").replace(/,/g, ""));
       return bAm - aAm;
+    } else {
+
+
+
+      if (sortCol === 'date') {
+
+        //sort dates from MM/DD/YYYY format from newest to oldest
+
+        const aDate: number = new Date(a['DATE']).getTime();
+        const bDate: number = new Date(b['DATE']).getTime();
+
+        return bDate - aDate;
+
+      }
+      else {
+        return 0;
+      }
     }
 
-    if (sortCol === 'date') {
-
-      //sort dates from MM/DD/YYYY format from newest to oldest
-
-      const aDate: number = new Date(a['DATE']).getTime();
-      const bDate: number = new Date(b['DATE']).getTime();
-
-      return bDate - aDate;
-
-    }
 
   };
 
@@ -64,7 +137,8 @@ export default function HomePage() {
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
-        <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
 
       </Head>
       <MantineProvider
@@ -149,8 +223,7 @@ export default function HomePage() {
                       return amount >= 100000
                     })
                     .sort((a: any, b: any) => {
-                      return sortElements(a, b)
-
+                      return sortElements(a, b);
                     })
                     .map((item, itemkey) => (
                       <div
@@ -172,27 +245,9 @@ export default function HomePage() {
 
                           <p className='lexend text-gray-200 font-light'>{item["Description/Notes"]}</p>
 
-                          {item["Supportive Links"].match(urlexp) && (
-                            <p className='lexend text-gray-200 font-light'><span className='font-medium'>Links: </span>{
-
-
-                              item["Supportive Links"].match(urlexp)
-                                .map((url, urlkey) => (
-                                  <>
-                                    <a key={urlkey} href={url} target="_blank" className='underline text-teal-300 hover:text-cyan-400' rel="noreferrer">{url.replace(/http(s)?:\/\//, "")}</a>
-                                    {
-                                      urlkey != (item["Supportive Links"].match(urlexp).length - 1) && (
-                                        <br />
-                                      )
-                                    }
-                                  </>
-                                )
-
-                                )
-                            }
-
-                            </p>
-                          )}
+                          < SupportingLinks
+                            str={item["Supportive Links"]}
+                          />
 
                           <div></div>
                         </>
@@ -204,15 +259,17 @@ export default function HomePage() {
 
 
 
-              <div className={`w-full ${format == "table" ? "hidden md:block" : "hidden"}`}>
+              <div className={`w-full ${format === "table" ? "hidden md:block" : "hidden"}`}>
                 < table className="table-auto w-full">
                   <thead className='bg-zinc-800'>
-                    <th className="border border-gray-600">Category</th>
-                    <th className="border border-gray-600">Description</th>
-                    <th className="border border-gray-600">Links</th>
-                    <th className="border border-gray-600">Date</th>
-                    <th className="border border-gray-600">Paid To</th>
-                    <th className="border border-gray-600">Amount</th>
+                    <tr>
+                      <th className="border border-gray-600">Category</th>
+                      <th className="border border-gray-600">Description</th>
+                      <th className="border border-gray-600">Links</th>
+                      <th className="border border-gray-600">Date</th>
+                      <th className="border border-gray-600">Paid To</th>
+                      <th className="border border-gray-600">Amount</th>
+                    </tr>
                   </thead>
                   <tbody>
                     {
@@ -229,37 +286,21 @@ export default function HomePage() {
 
                           })
                         .map((item, itemkey) => (
-                          <>
-                            <tr>
-                              <td className="align-top border border-gray-500 ">{item['Category']}</td>
+
+                          <tr key={itemkey}>
+                            <td className="align-top border border-gray-500 ">{item['Category']}</td>
 
 
-                              <td className='align-top border border-gray-500 text-gray-200 font-light'> {item["Description/Notes"]}</td>
+                            <td className='align-top border border-gray-500 text-gray-200 font-light'> {item["Description/Notes"]}</td>
 
-                              <td className='align-top border border-gray-500 font-light max-w-sm'> {
+                            <td className='align-top border border-gray-500 font-light max-w-sm'> < SupportingLinks
+                              str={item["Supportive Links"]}
+                            /></td>
+                            <td className='align-top border border-gray-500'>{item['DATE']}</td>
+                            <td className='align-top border border-gray-500'>{titleCase(item['VENDOR NAME'])}</td>
+                            <td className="align-top border border-gray-500">{item['DOLLAR AMOUNT']}</td>
+                          </tr>
 
-                                item["Supportive Links"] && (
-                                  item["Supportive Links"].match(urlexp)
-                                    .map((url, urlkey) => (
-                                      <>
-                                        <a key={urlkey} href={url} target="_blank" className='underline text-teal-300 hover:text-cyan-400' rel="noreferrer">{url.replace(/http(s)?:\/\//, "")}</a>
-                                        {
-                                          urlkey != (item["Supportive Links"].match(urlexp).length - 1) && (
-                                            <br />
-                                          )
-                                        }
-                                      </>
-                                    )
-
-                                    )
-                                )
-
-                              }</td>
-                              <td className='align-top border border-gray-500'>{item['DATE']}</td>
-                              <td className='align-top border border-gray-500'>{titleCase(item['VENDOR NAME'])}</td>
-                              <td className="align-top border border-gray-500">{item['DOLLAR AMOUNT']}</td>
-                            </tr>
-                          </>
 
                         ))
                     }
