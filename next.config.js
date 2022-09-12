@@ -4,7 +4,7 @@ module.exports = {
     dirs: ['src'],
   },
   images: {
-    unoptimized: true,
+    disableStaticImages: true,
   },
 
   reactStrictMode: true,
